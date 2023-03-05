@@ -1,0 +1,38 @@
+﻿@model LBApp.Models.PublishingHouse
+
+@{
+    ViewData["Title"] = "Створення";
+}
+
+<h1>Створення</h1>
+
+<h4>Видавництво</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="PhName" class="control-label"></label>
+                <input asp-for="PhName" class="form-control" />
+                <span asp-validation-for="PhName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhDescr" class="control-label"></label>
+                <input asp-for="PhDescr" class="form-control" />
+                <span asp-validation-for="PhDescr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Створити" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Повернутися назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

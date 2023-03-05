@@ -1,0 +1,38 @@
+﻿@model LBApp.Models.Genre
+
+@{
+    ViewData["Title"] = "Створення";
+}
+
+<h1>Створення</h1>
+
+<h4>Жанр</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="GenreName" class="control-label"></label>
+                <input asp-for="GenreName" class="form-control" />
+                <span asp-validation-for="GenreName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GenreDescr" class="control-label"></label>
+                <input asp-for="GenreDescr" class="form-control" />
+                <span asp-validation-for="GenreDescr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Створити" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Повернутись назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

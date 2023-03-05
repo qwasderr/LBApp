@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LBApp", "LBApp\LBApp.csproj", "{725DFBA2-3E4C-4F11-9910-14BF7182CCAB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{725DFBA2-3E4C-4F11-9910-14BF7182CCAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{725DFBA2-3E4C-4F11-9910-14BF7182CCAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{725DFBA2-3E4C-4F11-9910-14BF7182CCAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{725DFBA2-3E4C-4F11-9910-14BF7182CCAB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A75BFDE-E281-4282-9FC5-5EA5B81A392B}
+	EndGlobalSection
+EndGlobal

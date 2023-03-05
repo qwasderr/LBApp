@@ -1,0 +1,46 @@
+﻿@model LBApp.Models.Comment
+
+@{
+    ViewData["Title"] = "Створення";
+}
+
+<h1>Створення</h1>
+
+<h4>Коментар</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ComText" class="control-label"></label>
+                <input asp-for="ComText" class="form-control" />
+                <span asp-validation-for="ComText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ComDate" class="control-label"></label>
+                <input asp-for="ComDate" class="form-control" />
+                <span asp-validation-for="ComDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BookId" class="control-label"></label>
+                <select asp-for="BookId" class ="form-control" asp-items="ViewBag.BookId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReaderId" class="control-label"></label>
+                <select asp-for="ReaderId" class ="form-control" asp-items="ViewBag.ReaderId"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Створити" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Повернутися назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

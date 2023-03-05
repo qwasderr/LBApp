@@ -1,0 +1,53 @@
+﻿@model IEnumerable<LBApp.Models.Comment>
+
+@{
+    ViewData["Title"] = "Коментарі";
+}
+
+<h1>Коментарі</h1>
+
+<p>
+    <a asp-action="Create">Створити</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ComText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ComDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Book)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reader)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ComText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ComDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.BookName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reader.ReaderName)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ComId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ComId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ComId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
