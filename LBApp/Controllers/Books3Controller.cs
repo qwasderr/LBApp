@@ -9,29 +9,29 @@ using LBApp.Models;
 
 namespace LBApp.Controllers
 {
-    public class Books2Controller : Controller
+    public class Books3Controller : Controller
     {
         private readonly DblibraryContext _context;
 
-        public Books2Controller(DblibraryContext context)
+        public Books3Controller(DblibraryContext context)
         {
             _context = context;
         }
 
-        // GET: Books2
-        public async Task<IActionResult> Index(int? id)
+        // GET: Books3
+        public async Task<IActionResult> Index()
         {
-            ViewBag.ReaderId = id;
+
             //var dblibraryContext = _context.Books.Include(b => b.Genre).Include(b => b.PublishingHouse);
-            var dblibraryContext = (from p in _context.ReadersBooks where (p.ReaderId == id) from d in _context.Books where d.BookId == p.BookId select d).Include(d => d.Genre).Include(d => d.PublishingHouse);
+            var dblibraryContext = (from d in _context.Books select d).Include(d => d.Genre).Include(d => d.PublishingHouse).Include(n=>n.AuthorsBooks);
+            //var dblibraryContext = (from d in _context.Books where d.BookId == p.BookId select d).Include(d => d.Genre).Include(d => d.PublishingHouse);
 
             return View(await dblibraryContext.ToListAsync());
         }
 
-        // GET: Books2/Details/5
-        public async Task<IActionResult> Details(int? id, int readerId)
+        // GET: Books3/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
-            ViewBag.ReaderId = readerId;
             if (id == null || _context.Books == null)
             {
                 return NotFound();
@@ -49,68 +49,52 @@ namespace LBApp.Controllers
             return View(book);
         }
 
-        // GET: Books2/Create
-        public IActionResult Create(int readerId)
+        // GET: Books3/Create
+        public IActionResult Create()
         {
-            ViewBag.ReaderId = readerId;
-            //ViewBag.ReaderName = _context.ReadersBooks.Where(b => b.ReaderId == readerId).FirstOrDefault().ReaderName;
             ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "GenreName");
             ViewData["PublishingHouseId"] = new SelectList(_context.PublishingHouses, "PhId", "PhName");
+            ViewData["Authors"] = new SelectList(_context.Authors, "AuthorId", "AuthorName");
             return View();
         }
 
-        // POST: Books2/Create
+        // POST: Books3/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(int readerId, [Bind("BookId,BookName,BookYear,BookPrice,GenreId,BookPagesCount,PublishingHouseId")] Book book)
+        public async Task<IActionResult> Create(int[] authorBooks, [Bind("BookId,BookName,BookYear,BookPrice,GenreId,BookPagesCount,PublishingHouseId")] Book book)
         {
-            ViewBag.ReaderId = readerId;
             ModelState.Remove("Genre");
-            if (_context.Books.Where(b => book.BookName == b.BookName).Count() > 0)
-            {
-                ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
-            }
-            if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
-            {
-                ModelState.AddModelError("BookYear", "Неможливий рік");
-            }
-            if (book.BookPrice < 0)
-            {
-                ModelState.AddModelError("BookPrice", "Неможлuва ціна");
-            }
-            if (book.BookPagesCount < 0)
-            {
-                ModelState.AddModelError("BookPagesCount", "Неможлuва кількість сторінок");
-            }
             if (ModelState.IsValid)
             {
                 _context.Add(book);
                 await _context.SaveChangesAsync();
-                ReadersBook rb = new ReadersBook();
-                rb.ReaderId = readerId;
-                rb.BookId = book.BookId;
-                _context.Add(rb);
-                await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-                return RedirectToAction("Index", "Books2", new { id = readerId});
-
+                foreach (var d in authorBooks) {
+                    AuthorsBook ab = new AuthorsBook();
+                    ab.AuthorId = d; 
+                    ab.BookId = book.BookId;
+                    ab.Author = _context.Authors.Where(b => ab.AuthorId == b.AuthorId).FirstOrDefault();
+                    ab.Book = _context.Books.Where(b => ab.BookId == b.BookId).FirstOrDefault();
+                    _context.Add(ab);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Index));
             }
             ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "GenreName", book.GenreId);
             ViewData["PublishingHouseId"] = new SelectList(_context.PublishingHouses, "PhId", "PhName", book.PublishingHouseId);
+            ViewData["Authors"] = new SelectList(_context.Authors, "AuthorId", "AuthorName");
             return View(book);
         }
 
-        // GET: Books2/Edit/5
-        public async Task<IActionResult> Edit(int? id, int readerId)
+        // GET: Books3/Edit/5
+        public async Task<IActionResult> Edit(int? id)
         {
-            ViewBag.ReaderId = readerId;
             if (id == null || _context.Books == null)
             {
                 return NotFound();
             }
-            
+
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
@@ -121,36 +105,18 @@ namespace LBApp.Controllers
             return View(book);
         }
 
-        // POST: Books2/Edit/5
+        // POST: Books3/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, int readerId, [Bind("BookId,BookName,BookYear,BookPrice,GenreId,BookPagesCount,PublishingHouseId")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("BookId,BookName,BookYear,BookPrice,GenreId,BookPagesCount,PublishingHouseId")] Book book)
         {
-            ViewBag.ReaderId = readerId;
             if (id != book.BookId)
             {
                 return NotFound();
             }
-            ModelState.Remove("Genre");
-            var namee = _context.Books.Where(b => book.BookName == b.BookName);
-            if (namee.Count() > 0 && namee.Where(b => b.BookId == id).Count() == 0)
-            {
-                ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
-            }
-            if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
-            {
-                ModelState.AddModelError("BookYear", "Неможливий рік");
-            }
-            if (book.BookPrice < 0)
-            {
-                ModelState.AddModelError("BookPrice", "Неможлuва ціна");
-            }
-            if (book.BookPagesCount <= 0)
-            {
-                ModelState.AddModelError("BookPagesCount", "Неможлuва кількість сторінок");
-            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -169,19 +135,16 @@ namespace LBApp.Controllers
                         throw;
                     }
                 }
-                //return RedirectToAction(nameof(Index));
-                return RedirectToAction("Index", "Books2", new { id = readerId});
-
+                return RedirectToAction(nameof(Index));
             }
             ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "GenreName", book.GenreId);
             ViewData["PublishingHouseId"] = new SelectList(_context.PublishingHouses, "PhId", "PhName", book.PublishingHouseId);
             return View(book);
         }
 
-        // GET: Books2/Delete/5
-        public async Task<IActionResult> Delete(int? id, int readerId)
+        // GET: Books3/Delete/5
+        public async Task<IActionResult> Delete(int? id)
         {
-            ViewBag.ReaderId = readerId;
             if (id == null || _context.Books == null)
             {
                 return NotFound();
@@ -199,34 +162,23 @@ namespace LBApp.Controllers
             return View(book);
         }
 
-        // POST: Books2/Delete/5
+        // POST: Books3/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id, int readerId)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            ViewBag.ReaderId = readerId;
             if (_context.Books == null)
             {
                 return Problem("Entity set 'DblibraryContext.Books'  is null.");
             }
             var book = await _context.Books.FindAsync(id);
-            var t = _context.ReadersBooks.Where(b => b.BookId == id);
             if (book != null)
             {
-                foreach (var q in t)
-                {
-                    var idab = q.Id;
-                    var ab = await _context.ReadersBooks.FindAsync(idab);
-                    _context.ReadersBooks.Remove(ab);
-                    //await _context.SaveChangesAsync();
-                }
                 _context.Books.Remove(book);
             }
             
             await _context.SaveChangesAsync();
-            //_context.Dispose();
-            //return RedirectToAction(nameof(Index));
-            return RedirectToAction("Index", "Books2", new { id = ViewBag.ReaderId});
+            return RedirectToAction(nameof(Index));
         }
 
         private bool BookExists(int id)

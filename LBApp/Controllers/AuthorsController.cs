@@ -102,6 +102,11 @@ namespace LBApp.Controllers
             {
                 ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
             }*/
+            var namee = _context.Authors.Where(b => author.AuthorName == b.AuthorName);
+            if (namee.Count() > 0 && namee.Where(b => b.AuthorId == id).Count() == 0)
+            {
+                ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
+            }
             if (ModelState.IsValid)
             {
                 try

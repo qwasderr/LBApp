@@ -97,7 +97,11 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-
+            var namee = _context.PublishingHouses.Where(b => publishingHouse.PhName == b.PhName);
+            if (namee.Count() > 0 && namee.Where(b => b.PhId == id).Count() == 0)
+            {
+                ModelState.AddModelError("PhName", "Видавництво з таким ім'ям вже існує");
+            }
             if (ModelState.IsValid)
             {
                 try

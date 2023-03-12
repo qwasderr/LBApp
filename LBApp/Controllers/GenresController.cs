@@ -98,7 +98,11 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-
+            var namee = _context.Genres.Where(b => genre.GenreName == b.GenreName);
+            if (namee.Count() > 0 && namee.Where(b => b.GenreId == id).Count() == 0)
+            {
+                ModelState.AddModelError("GenreName", "Жанр з таким ім'ям вже існує");
+            }
             if (ModelState.IsValid)
             {
                 try

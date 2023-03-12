@@ -98,7 +98,7 @@ namespace LBApp.Controllers
             {
                 ModelState.AddModelError("BookPrice", "Неможлuва ціна");
             }
-            if (book.BookPagesCount < 0)
+            if (book.BookPagesCount <= 0)
             {
                 ModelState.AddModelError("BookPagesCount", "Неможлuва кількість сторінок");
             }

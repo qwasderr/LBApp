@@ -62,6 +62,8 @@ namespace LBApp.Controllers
         {
             ModelState.Remove("Book");
             ModelState.Remove("Author");
+            authorsBook.Author = _context.Authors.Where(b=>authorsBook.AuthorId==b.AuthorId).FirstOrDefault();
+            authorsBook.Book = _context.Books.Where(b => authorsBook.BookId == b.BookId).FirstOrDefault();
             if (_context.AuthorsBooks.Where(b=>authorsBook.AuthorId==b.AuthorId).Where(b=> authorsBook.BookId == b.BookId).Count()>0)
             {
                 ModelState.AddModelError("AuthorId", "Дублікат");
@@ -110,6 +112,8 @@ namespace LBApp.Controllers
             }
             ModelState.Remove("Book");
             ModelState.Remove("Author");
+            authorsBook.Author = _context.Authors.Where(b => authorsBook.AuthorId == b.AuthorId).FirstOrDefault();
+            authorsBook.Book = _context.Books.Where(b => authorsBook.BookId == b.BookId).FirstOrDefault();
             if (_context.AuthorsBooks.Where(b => authorsBook.AuthorId == b.AuthorId).Where(b => authorsBook.BookId == b.BookId).Count() > 0)
             {
                 ModelState.AddModelError("AuthorId", "Дублікат");

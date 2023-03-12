@@ -25,9 +25,9 @@ public partial class Book
     
     [Display(Name = "Назва видавництва")]
     public int? PublishingHouseId { get; set; }
-
+    [Display(Name = "Ім'я авторів")]
     public virtual ICollection<AuthorsBook> AuthorsBooks { get; } = new List<AuthorsBook>();
-
+    [Display(Name = "Коментарі")]
     public virtual ICollection<Comment> Comments { get; } = new List<Comment>();
     
     [Display(Name = "Назва жанру")]
