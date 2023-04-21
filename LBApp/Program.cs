@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using DocumentFormat.OpenXml.Wordprocessing;
 using LBApp;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +18,14 @@ builder.Services.AddDbContext<IdentityContext>(option => option.UseSqlServer(
 builder.Configuration.GetConnectionString("IdentityConnection")
 ));
 builder.Services.AddControllersWithViews();
-builder.Services.AddIdentity<Reader, IdentityRole>().AddEntityFrameworkStores<IdentityContext>();
+builder.Services.AddIdentity<User, IdentityRole>(opts => {
+    opts.Password.RequiredLength = 5;  
+    opts.Password.RequireNonAlphanumeric = true;   
+    opts.Password.RequireLowercase = true; 
+    opts.Password.RequireUppercase = true; 
+    opts.Password.RequireDigit = true; 
+})
+    .AddEntityFrameworkStores<IdentityContext>().AddDefaultTokenProviders(); ;
 
 
 var app = builder.Build();
@@ -29,9 +37,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var userManager = services.GetRequiredService<UserManager<Reader>>();
+        var userManager = services.GetRequiredService<UserManager<User>>();
         var rolesManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        await RoleInitializer.InitializeAsync(userManager, rolesManager);
+        await RoleInitializer.InitializeAsync(userManager, rolesManager, app);
     }
     catch (Exception ex)
     {

@@ -82,6 +82,22 @@ namespace LBApp.Controllers
         public async Task<IActionResult> Create(int[] authorBooks, [Bind("BookId,BookName,BookYear,BookPrice,GenreId,BookPagesCount,PublishingHouseId")] Book book)
         {
             ModelState.Remove("Genre");
+            if (_context.Books.Where(b => book.BookName == b.BookName).Count() > 0)
+            {
+                ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
+            }
+            if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
+            {
+                ModelState.AddModelError("BookYear", "Неможливий рік");
+            }
+            if (book.BookPrice < 0)
+            {
+                ModelState.AddModelError("BookPrice", "Неможлuва ціна");
+            }
+            if (book.BookPagesCount < 0)
+            {
+                ModelState.AddModelError("BookPagesCount", "Неможлuва кількість сторінок");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(book);
@@ -132,7 +148,24 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-
+            ModelState.Remove("Genre");
+            var namee = _context.Books.Where(b => book.BookName == b.BookName);
+            if (namee.Count() > 0 && namee.Where(b => b.BookId == id).Count() == 0)
+            {
+                ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
+            }
+            if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
+            {
+                ModelState.AddModelError("BookYear", "Неможливий рік");
+            }
+            if (book.BookPrice < 0)
+            {
+                ModelState.AddModelError("BookPrice", "Неможлuва ціна");
+            }
+            if (book.BookPagesCount <= 0)
+            {
+                ModelState.AddModelError("BookPagesCount", "Неможлuва кількість сторінок");
+            }
             if (ModelState.IsValid)
             {
                 try

@@ -48,16 +48,6 @@
         </dd>
     </dl>
 </div>
-@if (User.IsInRole("admin"))
-{
-    <div>
-        @Html.ActionLink("Редагувати", "Edit", new {id= Model?.BookId}) |
-        @Html.ActionLink("Повернутись назад", "Index","Books", new {id= @ViewBag.GenreId, name=@ViewBag.GenreName})
-    </div>
-}
-else
-{
-    <div>
-        @Html.ActionLink("Повернутись назад", "Index","Books", new {id= @ViewBag.GenreId, name=@ViewBag.GenreName})
-    </div>
-}
+<div>
+    @Html.ActionLink("Повернутись назад", "Index", new {name=User.Identity.Name})
+</div>

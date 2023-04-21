@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LBApp.Models;
 
-public class Reader: IdentityUser
+public class Reader
 {
-    [Key]
     public int ReaderId { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Iм'я користувача")]

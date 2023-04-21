@@ -5,10 +5,12 @@
 }
 
 <h1>Книги @ViewBag.AuthorName</h1>
-
-<p>
-    @Html.ActionLink("Додати нову книгу", "Create", "Books1", new {authorId = @ViewBag.AuthorId})
-</p>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        @Html.ActionLink("Додати нову книгу", "Create", "Books1", new {authorId = @ViewBag.AuthorId})
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -54,11 +56,21 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PublishingHouse.PhName)
             </td>
-            <td>
-                    @Html.ActionLink("Edit", "Edit", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId}) |
-                    @Html.ActionLink("Details", "Details", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId}) |
-                    @Html.ActionLink("Delete", "Delete", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId})
-            </td>
+           
+                @if (User.IsInRole("admin"))
+                {
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId}) |
+                        @Html.ActionLink("Details", "Details", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId}) |
+                        @Html.ActionLink("Delete", "Delete", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId})
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.ActionLink("Details", "Details", "Books1", new {id= @item.BookId, authorId = @ViewBag.AuthorId})
+                    </td>
+                }
         </tr>
 }
     </tbody>

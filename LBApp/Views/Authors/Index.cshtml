@@ -5,10 +5,12 @@
 }
 
 <h1>Автори</h1>
-
-<p>
-    <a asp-action="Create">Створити нового автора</a>
-</p>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        <a asp-action="Create">Створити нового автора</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -36,11 +38,20 @@
             <td>
                 @Html.DisplayFor(modelItem => item.AuthorBiogr)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
-            </td>
+                @if (User.IsInRole("admin"))
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.AuthorId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.AuthorId">Delete</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.AuthorId">Details</a>
+                    </td>
+                }
         </tr>
 }
     </tbody>

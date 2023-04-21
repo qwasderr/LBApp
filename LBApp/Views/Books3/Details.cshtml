@@ -1,13 +1,13 @@
 ﻿@model LBApp.Models.Book
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі";
 }
 
-<h1>Details</h1>
+<h1>Деталі</h1>
 
 <div>
-    <h4>Book</h4>
+    <h4>Книга</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -44,7 +44,7 @@
             @Html.DisplayNameFor(model => model.PublishingHouse)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PublishingHouse.PhId)
+            @Html.DisplayFor(model => model.PublishingHouse.PhName)
         </dd>
         <p>Автори:</p>
         <dd>
@@ -60,6 +60,23 @@
 </div>
 <div>
     
-    @Html.ActionLink("Відкрити коментарі", "Index", "CommentsRdr", new {BookId=Model.BookId})
-    <a asp-action="Index">Back to List</a>
+    @Html.ActionLink("Відкрити коментарі", "Index", "CommentsRdr", new {BookId=Model.BookId, Readername=User.Identity.Name})
+    <a asp-action="Index">Повернутися назад</a>
 </div>
+
+<form>
+    @if (User.Identity.Name != null)
+    {
+        @if (LBApp.Controllers.ReadersBooksController.isInFav(User.Identity.Name, Model.BookId) == true)
+        {
+            <p><b>Книга додана до улюблених</b></p>
+        }
+        else
+        {
+            @Html.ActionLink("Додати до улюблених", "Create2", "ReadersBooks", new {name=@User.Identity.Name, id=Model.BookId})
+            //LBApp.Controllers.ReadersBooksController.Create2(User.Identity.Name, Model.BookId);
+        }
+
+    }
+</form>
+

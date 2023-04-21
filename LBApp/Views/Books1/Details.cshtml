@@ -48,11 +48,24 @@
         </dd>
     </dl>
 </div>
-<div>
-    <form asp-action="Edit">
-        <input type="hidden" value="@ViewBag.AuthorId" name="AuthorId" />
-        @Html.ActionLink("Редагувати", "Edit", new {id= Model?.BookId, authorId=@ViewBag.AuthorId}) |
-        @Html.ActionLink("Повернутись назад", "Index","Books1", new {id= @ViewBag.AuthorId, name=ViewBag.AuthorName})
-    </form>
-    
-</div>
+@if (User.IsInRole("admin"))
+{
+    <div>
+        <form asp-action="Edit">
+            <input type="hidden" value="@ViewBag.AuthorId" name="AuthorId" />
+            @Html.ActionLink("Редагувати", "Edit", new {id= Model?.BookId, authorId=@ViewBag.AuthorId}) |
+            @Html.ActionLink("Повернутись назад", "Index","Books1", new {id= @ViewBag.AuthorId, name=ViewBag.AuthorName})
+        </form>
+
+    </div>
+}
+else
+{
+    <div>
+        <form asp-action="Edit">
+            <input type="hidden" value="@ViewBag.AuthorId" name="AuthorId" />
+            @Html.ActionLink("Повернутись назад", "Index","Books1", new {id= @ViewBag.AuthorId, name=ViewBag.AuthorName})
+        </form>
+
+    </div>
+}

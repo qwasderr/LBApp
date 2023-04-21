@@ -19,26 +19,77 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                      @if (User.IsInRole("admin")){
+                      
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Books3" asp-action="Index">Книги</a>
                         </li>
-                      }
+                      
+                       
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Genres" asp-action="Index">Жанри</a>
                         </li>
+                        @if (User.IsInRole("admin") || User.IsInRole("user"))
+                        {
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Books4" asp-action="Index" asp-route-name="@User.Identity.Name">Корзина</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Authors" asp-action="Index">Автори</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Comments" asp-action="Index">Коментарі</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Readers" asp-action="Index">Читачі</a>
-                        </li>
+                        @if (User.IsInRole("admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Comments" asp-action="Index">Коментарі</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Readers" asp-action="Index">Читачі</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="ReadersBooks" asp-action="Index">Читачі-Книги</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Roles" asp-action="Index">Ролі</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Акаунти</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="PublishingHouses" asp-action="Index">Видавництва</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Diagrams" asp-action="Index">Діаграми</a>
                         </li>
+                        <style>
+                            .li1 {
+                                margin-left: auto;
+                                margin-right: 0;
+                                
+                               
+                            }
+                        </style>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            
+                            <li class="li1"><p>@User.Identity.Name</p></li>
+                            <form method="post" asp-controller="Account" asp-action="Logout">
+                                <li class="li1"><input type="submit" value="Вихід"></li>
+
+                            </form>
+                            
+                        }
+                        else
+                        {
+                            <li class="li1">
+                                <a asp-controller="Account" asp-action="Login">Вхід</a>
+                                
+                            
+                                <a asp-controller="Account" asp-action="Register">Реєстрація</a>
+                                </li>
+                        }
                     </ul>
                 </div>
             </div>

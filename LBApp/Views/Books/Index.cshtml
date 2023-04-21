@@ -9,9 +9,12 @@
     <h3>Завантаження файлу: </h3>
     @Html.ActionLink("Завантажити", "Export", "Books", new {genreId=@ViewBag.GenreId})
 </div>
-<p>
-    @Html.ActionLink("Додати нову книгу", "Create", "Books", new {genreId= @ViewBag.GenreId})
-</p>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        @Html.ActionLink("Додати нову книгу", "Create", "Books", new {genreId= @ViewBag.GenreId})
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -57,11 +60,21 @@
             <td>
                 @Html.DisplayFor(modelItem => item.PublishingHouse.PhName)
             </td>
-            <td>
-                    @Html.ActionLink("Edit", "Edit", new {id= @item.BookId}) |
-                    @Html.ActionLink("Details", "Details", new {id= @item.BookId}) |
-                    @Html.ActionLink("Delete", "Delete", new {id= @item.BookId})
-            </td>
+            
+                @if (User.IsInRole("admin"))
+                {
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new {id= @item.BookId}) |
+                        @Html.ActionLink("Details", "Details", new {id= @item.BookId}) |
+                        @Html.ActionLink("Delete", "Delete", new {id= @item.BookId})
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.ActionLink("Details", "Details", new {id= @item.BookId})
+                    </td>
+                }
         </tr>
 }
     </tbody>

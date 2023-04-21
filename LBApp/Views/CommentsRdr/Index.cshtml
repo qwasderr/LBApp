@@ -1,14 +1,17 @@
 ﻿@model IEnumerable<LBApp.Models.Comment>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Коментарі";
 }
 
 <h1>Коментарі до книги @ViewBag.BookName</h1>
-
+<input type="hidden" name="Readername" value="@User.Identity.Name" />
+@if (User.IsInRole("admin") || User.IsInRole("user"))
+           {
 <p>
-    @Html.ActionLink("Створити новий", "Create", new {Bookid=@ViewBag.Bookid})
+    @Html.ActionLink("Створити новий", "Create", new {Bookid=@ViewBag.Bookid, Readerid=ViewBag.Readerid})
 </p>
+           }
 <table class="table">
     <thead>
         <tr>
@@ -36,13 +39,22 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Reader.ReaderName)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ComId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ComId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ComId">Delete</a>
-            </td>
+                @if (User.IsInRole("admin"))
+                {
+                    <td>
+                        @Html.ActionLink("Edit", "Edit", new {id=item.ComId}) |
+                        <a asp-action="Details" asp-route-id="@item.ComId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ComId">Delete</a>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.ComId">Details</a>
+                    </td>
+                }
         </tr>
 }
-        <a asp-action="Details" asp-controller="Books3" asp-route-id="@ViewBag.Bookid">Back to List</a>
+        <a asp-action="Details" asp-controller="Books3" asp-route-id="@ViewBag.Bookid">Повернутися назад</a>
     </tbody>
 </table>

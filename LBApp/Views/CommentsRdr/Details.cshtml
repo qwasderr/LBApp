@@ -1,13 +1,13 @@
 ﻿@model LBApp.Models.Comment
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі";
 }
 
-<h1>Details</h1>
+<h1>Деталі</h1>
 
 <div>
-    <h4>Comment</h4>
+    <h4>Коментар</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -36,7 +36,17 @@
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.ComId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@if (User.IsInRole("admin"))
+{
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model?.ComId">Редагувати</a> |
+        @Html.ActionLink("Повернутись назад", "Index", new {Bookid=@ViewBag.Bookid, Readername=User.Identity.Name})
+    </div>
+}
+else
+{
+    <div>
+        @Html.ActionLink("Повернутись назад", "Index", new {Bookid=@ViewBag.Bookid, Readername=User.Identity.Name})
+    </div>
+}
+

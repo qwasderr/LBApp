@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LBApp.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace LBApp.Controllers
 {
@@ -72,7 +75,64 @@ namespace LBApp.Controllers
             ViewData["ReaderId"] = new SelectList(_context.Readers, "ReaderId", "ReaderId", readersBook.ReaderId);
             return View(readersBook);
         }
+        static public bool isInFav(string Rname, int BookId)
+        {
+            if (Rname == null) return false;
+            DblibraryContext _context = new DblibraryContext();
+            var t=_context.Readers.Where(c=>c.ReaderName==Rname).FirstOrDefault().ReaderId;
+            var books=_context.ReadersBooks.Where(c=>c.ReaderId==t && c.BookId==BookId);
+            if (books.Count() > 0) return true;
+            else return false;
+        }
 
+
+
+        public IActionResult Create2(string name, int id)
+        {
+            ModelState.Remove("Book");
+            ModelState.Remove("Reader");
+            ReadersBook rb = new ReadersBook();
+            //DblibraryContext _context = new DblibraryContext();
+            var ReaderId = _context.Readers.Where(c => c.ReaderName == name).FirstOrDefault().ReaderId;
+            rb.ReaderId = ReaderId;
+            rb.BookId = id;
+            if (ModelState.IsValid)
+            {
+                _context.Add(rb);
+                 _context.SaveChangesAsync();
+                return RedirectToAction("Details", "Books3", new { id = id });
+            }
+            //ViewData["BookId"] = new SelectList(_context.Books, "BookId", "BookName", readersBook.BookId);
+            //ViewData["ReaderId"] = new SelectList(_context.Readers, "ReaderId", "ReaderId", readersBook.ReaderId);
+            return View(rb);
+
+            //ViewData["BookId"] = new SelectList(_context.Books, "BookId", "BookName");
+            //ViewData["ReaderId"] = new SelectList(_context.Readers, "ReaderId", "ReaderName");
+            //return View();
+        }
+
+       /* [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create2(string name, int id)
+        {
+            ModelState.Remove("Book");
+            ModelState.Remove("Reader");
+            ReadersBook rb = new ReadersBook();
+            //DblibraryContext _context = new DblibraryContext();
+            var ReaderId = _context.Readers.Where(c => c.ReaderName == name).FirstOrDefault().ReaderId;
+            rb.ReaderId = ReaderId;
+            rb.BookId = id;
+           if (ModelState.IsValid)
+            {
+                _context.Add(rb);
+                 await _context.SaveChangesAsync();
+                return RedirectToAction("Details", "Book3", new { Bookid = id });
+            }
+            //ViewData["BookId"] = new SelectList(_context.Books, "BookId", "BookName", readersBook.BookId);
+            //ViewData["ReaderId"] = new SelectList(_context.Readers, "ReaderId", "ReaderId", readersBook.ReaderId);
+            return View(rb);
+            
+        }*/
         // GET: ReadersBooks/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
