@@ -5,7 +5,19 @@
 }
 
 <h1>Жанри</h1>
-
+<div>
+<h3>Оберіть excel-файл для заватаження</h3>
+@using (Html.BeginForm("Import","Genres",FormMethod.Post, new { enctype ="multipart/form-data", id ="frm-excel"}))
+{
+<div>
+Завантажте Excel-файл:
+<input type = "file" name="fileExcel" id="fileExcel"/>
+<div>
+<input type = "submit" value="Завантажити" />
+</div>
+</div>
+}
+</div>
 <p>
     <a asp-action="Create">Створити Жанр</a>
 </p>
@@ -39,3 +51,30 @@
 }
     </tbody>
 </table>
+
+<div class="container">
+    <div id="chart1"></div>
+</div>
+@section scripts{
+    <script type "text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+
+            $.get('/api/Chart/JsonData', function (JsonData) {
+                data = google.visualization.arrayToDataTable(JsonData, false);
+                var option = {
+                    title: "Діаграма співвідношення кількості книжок відповідних жанрів",
+                    width: 500,
+                    height: 400
+                };
+                chart = new google.visualization.PieChart(document.getElementById('chart1'));
+                chart.draw(data, option);
+
+            })
+        }
+    </script>
+}
+

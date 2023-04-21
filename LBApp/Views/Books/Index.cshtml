@@ -5,7 +5,10 @@
 }
 
 <h1>Книги за жанром @ViewBag.GenreName</h1>
-
+<div>
+    <h3>Завантаження файлу: </h3>
+    @Html.ActionLink("Завантажити", "Export", "Books", new {genreId=@ViewBag.GenreId})
+</div>
 <p>
     @Html.ActionLink("Додати нову книгу", "Create", "Books", new {genreId= @ViewBag.GenreId})
 </p>

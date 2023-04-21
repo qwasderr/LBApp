@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LBApp.Models;
+using ClosedXML.Excel;
+using static System.Reflection.Metadata.BlobBuilder;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace LBApp.Controllers
 {
@@ -25,7 +29,7 @@ namespace LBApp.Controllers
             ViewBag.GenreId = id;
             ViewBag.GenreName = name;
             //var dblibraryContext = _context.Books.Include(b => b.Genre).Include(b => b.PublishingHouse);
-            var dblibraryContext = _context.Books.Where(b => b.GenreId==id).Include(b => b.Genre).Include(b=>b.PublishingHouse);
+            var dblibraryContext = _context.Books.Where(b => b.GenreId == id).Include(b => b.Genre).Include(b => b.PublishingHouse);
             return View(await dblibraryContext.ToListAsync());
         }
 
@@ -54,7 +58,7 @@ namespace LBApp.Controllers
         public IActionResult Create(int genreId)
         {
             //ViewData["GenreId"] = new SelectList(_context.Genres, "GenreId", "GenreName");
-            ViewBag.GenreId=genreId;
+            ViewBag.GenreId = genreId;
             ViewBag.GenreName = _context.Genres.Where(b => b.GenreId == genreId).FirstOrDefault().GenreName;
             ViewData["PublishingHouseId"] = new SelectList(_context.PublishingHouses, "PhId", "PhName");
             return View();
@@ -68,13 +72,13 @@ namespace LBApp.Controllers
         public async Task<IActionResult> Create(int genreId, [Bind("BookId,BookName,BookYear,BookPrice,BookPagesCount,PublishingHouseId")] Book book)
         {
             book.GenreId = genreId;
-            
+
             ModelState.Remove("Genre");
             if (_context.Books.Where(b => book.BookName == b.BookName).Count() > 0)
             {
                 ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
             }
-            if (book.BookYear<0 || book.BookYear>DateTime.Now.Year)
+            if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
             {
                 ModelState.AddModelError("BookYear", "Неможливий рік");
             }
@@ -135,10 +139,10 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-            
+
             ModelState.Remove("Genre");
             var namee = _context.Books.Where(b => book.BookName == b.BookName);
-            if (namee.Count() > 0 && namee.Where(b=>b.BookId==id).Count()==0)
+            if (namee.Count() > 0 && namee.Where(b => b.BookId == id).Count() == 0)
             {
                 ModelState.AddModelError("BookName", "Книжка з таким ім'ям вже існує");
             }
@@ -228,7 +232,7 @@ namespace LBApp.Controllers
             {
                 foreach (var q in _context.AuthorsBooks.Where(b => b.BookId == id))
                 {
-                    var idab=q.Id;
+                    var idab = q.Id;
                     var ab = await _context.AuthorsBooks.FindAsync(idab);
                     _context.AuthorsBooks.Remove(ab);
                 }
@@ -242,7 +246,73 @@ namespace LBApp.Controllers
 
         private bool BookExists(int id)
         {
-          return (_context.Books?.Any(e => e.BookId == id)).GetValueOrDefault();
+            return (_context.Books?.Any(e => e.BookId == id)).GetValueOrDefault();
+        }
+
+
+
+
+
+        public ActionResult Export(int genreId)
+        {
+            using (XLWorkbook workbook = new XLWorkbook())
+            {
+                var gname = _context.Genres.Where(b => b.GenreId == genreId).FirstOrDefault().GenreName;
+                var worksheet = workbook.Worksheets.Add(gname);
+                worksheet.Cell("A1").Value = "Назва";
+                worksheet.Cell("B1").Value = "Кількість сторінок";
+                worksheet.Cell("C1").Value = "Ціна";
+                worksheet.Cell("D1").Value = "Рік написання";
+                worksheet.Cell("E1").Value = "Автор 1";
+                worksheet.Cell("F1").Value = "Автор 2";
+                worksheet.Cell("G1").Value = "Автор 3";
+                worksheet.Row(1).Style.Font.Bold = true;
+                var books = _context.Books.Where(b => b.GenreId == genreId).ToList();
+                int temp = 2;
+                for (int i = 0; i < books.Count; i++)
+                {
+                    worksheet.Cell(i + temp, 1).Value = books[i].BookName;
+                    worksheet.Cell(i + temp, 2).Value = books[i].BookPagesCount;
+                    worksheet.Cell(i + temp, 3).Value = books[i].BookPrice;
+                    worksheet.Cell(i + temp, 4).Value = books[i].BookYear;
+                    var ab = _context.AuthorsBooks.Where(a => a.BookId == books[i].BookId).Include("Author").ToList();
+                    int j = 0;
+                    int maxauth = 3;
+                    int temp2 = 5;
+                    foreach (var a in ab)
+                    {
+                        if (j <= maxauth)
+                        {
+                            worksheet.Cell(i + temp, j + temp2).Value = a.Author.AuthorName;
+                            j++;
+                        }
+                    }
+
+                }
+
+
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    stream.Flush();
+                    return new FileContentResult(stream.ToArray(),
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                    {
+
+                        FileDownloadName = $"Books_Genres_{DateTime.UtcNow.ToShortDateString()}.xlsx"
+                    };
+                }
+
+
+
+
+
+            }
+
+
+
+
         }
     }
 }

@@ -9,16 +9,16 @@ using LBApp.Models;
 
 namespace LBApp.Controllers
 {
-    public class AuthorsController : Controller
+    public class Authors1Controller : Controller
     {
         private readonly DblibraryContext _context;
 
-        public AuthorsController(DblibraryContext context)
+        public Authors1Controller(DblibraryContext context)
         {
             _context = context;
         }
 
-        // GET: Authors
+        // GET: Authors1
         public async Task<IActionResult> Index()
         {
               return _context.Authors != null ? 
@@ -26,8 +26,8 @@ namespace LBApp.Controllers
                           Problem("Entity set 'DblibraryContext.Authors'  is null.");
         }
 
-        // GET: Authors/Details/5
-        public async Task<IActionResult> Details(int? id)
+        // GET: Authors1/Details/5
+        public async Task<IActionResult> Details(int? id, int BookId)
         {
             if (id == null || _context.Authors == null)
             {
@@ -40,45 +40,23 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-
-            //return View(author);
-            return RedirectToAction("Index", "Books1", new { id = author.AuthorId, name = author.AuthorName });
+            ViewBag.BookId = BookId;
+            return View(author);
         }
 
-        // GET: Authors/Create
+        // GET: Authors1/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Authors/Create
+        // POST: Authors1/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        public bool check(string s1, string s2)
-        {
-            string[] ss1 = s1.Split(' ');
-            string[] ss2 = s2.Split(' ');
-            Array.Sort(ss1);
-            Array.Sort(ss2);
-            return ss1.SequenceEqual(ss2);
-
-        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AuthorId,AuthorName,AuthorDate,AuthorBiogr")] Author author)
         {
-            foreach (var i in _context.Authors)
-            {
-                if (check(i.AuthorName,author.AuthorName)) ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
-            }
-            if (_context.Authors.Where(b => author.AuthorName == b.AuthorName).Count() > 0)
-            {
-                ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
-            }
-            if (author.AuthorDate.Value.Year<1300)
-            {
-                ModelState.AddModelError("AuthorDate", "Некорректний рік");
-            }
             if (ModelState.IsValid)
             {
                 _context.Add(author);
@@ -88,7 +66,7 @@ namespace LBApp.Controllers
             return View(author);
         }
 
-        // GET: Authors/Edit/5
+        // GET: Authors1/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Authors == null)
@@ -104,7 +82,7 @@ namespace LBApp.Controllers
             return View(author);
         }
 
-        // POST: Authors/Edit/5
+        // POST: Authors1/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
@@ -115,15 +93,7 @@ namespace LBApp.Controllers
             {
                 return NotFound();
             }
-            /*if (_context.Authors.Where(b => author.AuthorName == b.AuthorName).Count() > 0)
-            {
-                ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
-            }*/
-            var namee = _context.Authors.Where(b => author.AuthorName == b.AuthorName);
-            if (namee.Count() > 0 && namee.Where(b => b.AuthorId == id).Count() == 0)
-            {
-                ModelState.AddModelError("AuthorName", "Автор з таким ім'ям вже існує");
-            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -147,7 +117,7 @@ namespace LBApp.Controllers
             return View(author);
         }
 
-        // GET: Authors/Delete/5
+        // GET: Authors1/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Authors == null)
@@ -165,7 +135,7 @@ namespace LBApp.Controllers
             return View(author);
         }
 
-        // POST: Authors/Delete/5
+        // POST: Authors1/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -175,12 +145,6 @@ namespace LBApp.Controllers
                 return Problem("Entity set 'DblibraryContext.Authors'  is null.");
             }
             var author = await _context.Authors.FindAsync(id);
-            if (_context.AuthorsBooks.Where(b => b.AuthorId == author.AuthorId).Count() > 0)
-            {
-                //return Problem("У цього автора є книги");
-                ModelState.AddModelError("AuthorId", "У цього автора є книги");
-                return View(author);
-            }
             if (author != null)
             {
                 _context.Authors.Remove(author);

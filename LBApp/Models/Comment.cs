@@ -8,6 +8,7 @@ namespace LBApp.Models;
 
 public partial class Comment
 {
+    [Key]
     public int ComId { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Текст коментаря")]

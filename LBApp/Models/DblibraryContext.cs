@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace LBApp.Models;
 
 public partial class DblibraryContext : DbContext
@@ -32,7 +34,6 @@ public partial class DblibraryContext : DbContext
     public virtual DbSet<ReadersBook> ReadersBooks { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseLazyLoadingProxies().UseSqlServer("Server= DESKTOP-VQ4QIBS\\SQLEXPRESS;\nDatabase=DBLibrary; Trusted_Connection=True; Trust Server Certificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

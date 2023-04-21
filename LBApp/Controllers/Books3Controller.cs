@@ -28,7 +28,23 @@ namespace LBApp.Controllers
 
             return View(await dblibraryContext.ToListAsync());
         }
+        public async Task<IActionResult> IndexS(string searchString)
+        {
+            if (_context.Books == null)
+            {
+                return Problem("Entity set 'MvcMovieContext.Movie'  is null.");
+            }
 
+            var b = from m in _context.Books
+                         select m;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                b = b.Where(s => s.BookName!.Contains(searchString));
+            }
+
+            return View(await b.ToListAsync());
+        }
         // GET: Books3/Details/5
         public async Task<IActionResult> Details(int? id)
         {

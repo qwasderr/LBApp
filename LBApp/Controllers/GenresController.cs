@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LBApp.Models;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LBApp.Controllers
 {
+    //[Authorize(Roles="admin")]
     public class GenresController : Controller
     {
         private readonly DblibraryContext _context;
@@ -21,9 +25,9 @@ namespace LBApp.Controllers
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-              return _context.Genres != null ? 
-                          View(await _context.Genres.ToListAsync()) :
-                          Problem("Entity set 'DblibraryContext.Genres'  is null.");
+            return _context.Genres != null ?
+                        View(await _context.Genres.ToListAsync()) :
+                        Problem("Entity set 'DblibraryContext.Genres'  is null.");
         }
 
         // GET: Genres/Details/5
@@ -42,7 +46,7 @@ namespace LBApp.Controllers
             }
 
             //return View(genre);
-            return RedirectToAction("Index", "Books", new {id = genre.GenreId, name= genre.GenreName});
+            return RedirectToAction("Index", "Books", new { id = genre.GenreId, name = genre.GenreName });
         }
 
         // GET: Genres/Create
@@ -164,14 +168,151 @@ namespace LBApp.Controllers
             {
                 _context.Genres.Remove(genre);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool GenreExists(int id)
         {
-          return (_context.Genres?.Any(e => e.GenreId == id)).GetValueOrDefault();
+            return (_context.Genres?.Any(e => e.GenreId == id)).GetValueOrDefault();
         }
+
+
+        public bool check(string s1, string s2)
+        {
+            string[] ss1 = s1.Split(' ');
+            string[] ss2 = s2.Split(' ');
+            Array.Sort(ss1);
+            Array.Sort(ss2);
+            return ss1.SequenceEqual(ss2);
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Import(IFormFile fileExcel)
+        {
+
+            if (ModelState.IsValid)
+            {
+                if (fileExcel != null)
+                {
+                    using (var stream = new FileStream(fileExcel.FileName, FileMode.Create))
+                    {
+                        await fileExcel.CopyToAsync(stream);
+                        using (XLWorkbook workBook = new XLWorkbook(stream))
+                        {
+                            //перегляд усіх листів (в даному випадку категорій)
+                            foreach (var wst in workBook.Worksheets)
+                            {
+                                Genre genre = new Genre();
+                                var f = (from t in _context.Genres where t.GenreName.Contains(wst.Name) select t).FirstOrDefault();
+                                if (f != default(Genre))
+                                {
+                                    genre = f;
+                                }
+                                else
+                                {
+                                    genre.GenreName = wst.Name;
+                                    genre.GenreDescr = "Genre from Excel";
+                                    _context.Genres.Add(genre);
+
+                                }
+
+                                foreach (IXLRow row in wst.RowsUsed().Skip(1))
+                                {
+                                    try
+                                    {
+                                        Book book = new Book();
+                                        book.BookName = row.Cell(1).Value.ToString();
+                                        book.BookPagesCount = Convert.ToInt32(row.Cell(2).Value.ToString());
+                                        book.BookPrice = Convert.ToInt32(row.Cell(3).Value.ToString());
+                                        book.BookYear = Convert.ToInt32(row.Cell(4).Value.ToString());
+                                        book.Genre = genre;
+                                        int flag = 0;
+                                        if (_context.Books.Where(b => book.BookName == b.BookName).Count() > 0)
+                                        {
+                                            flag = 1; 
+                                        }
+                                        if (book.BookYear < 0 || book.BookYear > DateTime.Now.Year)
+                                        {
+                                            flag = 1; 
+                                        }
+                                        if (book.BookPrice < 0)
+                                        {
+                                            flag = 1;
+                                        }
+                                        if (book.BookPagesCount < 0)
+                                        {
+                                            flag = 1;
+                                        }
+                                        if (flag==0) { _context.Books.Add(book);
+
+                                            int start = 5;
+                                            int fin = 7;
+                                            for (int i = start; i <= fin; i++)
+                                            {
+                                                if (row.Cell(i).Value.ToString().Length > 0)
+                                                {
+                                                    Models.Author auth = new Models.Author();
+                                                    var a = (from aut in _context.Authors where aut.AuthorName.Contains(row.Cell(i).Value.ToString()) select aut).FirstOrDefault();
+                                                    if (a != default(Models.Author))
+                                                    {
+                                                        auth = a;
+                                                    }
+                                                    else
+                                                    {
+                                                        auth.AuthorName = row.Cell(i).Value.ToString();
+                                                        int flag2 = 0;
+                                                        foreach (var ii in _context.Authors)
+                                                        {
+                                                            if (check(ii.AuthorName, auth.AuthorName)) flag2 = 1;
+                                                        }
+                                                        if (_context.Authors.Where(b => auth.AuthorName == b.AuthorName).Count() > 0)
+                                                        {
+                                                            flag2 = 1;
+                                                        }
+                                                        if (flag2 == 0) { _context.Authors.Add(auth); _context.SaveChanges(); }
+                                  
+                                                       
+                                                    }
+                                                   
+                                                    AuthorsBook ab = new AuthorsBook();
+                                                    ab.Book = book;
+                                                    ab.Author = auth;
+                                                    _context.AuthorsBooks.Add(ab);
+                                                }
+                                                {
+                                                }
+
+
+                                            }
+
+
+                                        }
+                                        
+
+                                        
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        ModelState.AddModelError("fileExcel", "Error");
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
+        
     }
 }

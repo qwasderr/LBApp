@@ -7,3 +7,16 @@
     
 </div>
 <p style="text-align:center;"><img src="https://bookriot.com/wp-content/uploads/2015/06/cat-with-books-1280x720.jpg" height="500" width="650"/></p>
+@if (User.Identity.IsAuthenticated)
+{
+    <p>@User.Identity.Name</p>
+    <form method="post" asp-controller="Account" asp-action="Logout">
+        <input type="submit" value="Вихід">
+
+    </form>
+}
+else
+{
+    <a asp-controller="Account" asp-action="Login">Вхід</a>
+    <a asp-controller="Account" asp-action="Register">Реєстрація</a>
+}

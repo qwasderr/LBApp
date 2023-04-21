@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace LBApp.Models;
 
-public partial class Reader
+public class Reader: IdentityUser
 {
+    [Key]
     public int ReaderId { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Iм'я користувача")]
@@ -14,4 +16,5 @@ public partial class Reader
     public virtual ICollection<Comment> Comments { get; } = new List<Comment>();
 
     public virtual ICollection<ReadersBook> ReadersBooks { get; } = new List<ReadersBook>();
+    
 }

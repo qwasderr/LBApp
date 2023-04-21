@@ -46,9 +46,20 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PublishingHouse.PhId)
         </dd>
+        <p>Автори:</p>
+        <dd>
+            @foreach (var b in Model.AuthorsBooks)
+            {
+
+
+                <div>@Html.ActionLink(@b.Author.AuthorName, "Details","Authors1", new {id=b.Author.AuthorId, BookId=Model.BookId}) </div>
+            
+            }
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.BookId">Edit</a> |
+    
+    @Html.ActionLink("Відкрити коментарі", "Index", "CommentsRdr", new {BookId=Model.BookId})
     <a asp-action="Index">Back to List</a>
 </div>
